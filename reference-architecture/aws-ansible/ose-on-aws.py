@@ -59,6 +59,9 @@ import sys
               show_default=True)
 
 ### Subscription and Software options
+@click.option('--repo-mirror-url', help='Repository Mirror URL in case the host does not have a Red Hat Subscription')
+@click.option('--registry-mirror-url', help='Registry Mirror URL in case the host does not have access to the Red Hat Registry')
+@click.option('--rhsm-subscription', help='True or False whether host should have a Red Hat Subscription', show_default=True, default='yes')
 @click.option('--rhsm-user', help='Red Hat Subscription Management User')
 @click.option('--rhsm-password', help='Red Hat Subscription Management Password',
                 hide_input=True,)
@@ -110,6 +113,9 @@ def launch_refarch_env(region=None,
                     deployment_type=None,
                     openshift_sdn=None,
                     console_port=443,
+                    repo_mirror_url=None,
+                    registry_mirror_url=None,
+                    rhsm_subscription=None,
                     rhsm_user=None,
                     rhsm_password=None,
                     rhsm_pool=None,
@@ -135,7 +141,7 @@ def launch_refarch_env(region=None,
     s3_username = stack_name + '-s3-openshift-user'
 
   # Create ssh key pair in AWS if none is specified
-  if create_key in 'yes' and key_path in 'no':
+  if create_key in 'yes' and key_path in '/dev/null':
     key_path = click.prompt('Specify path for ssh public key')
     keypair = click.prompt('Specify a name for the keypair')
 
@@ -169,13 +175,22 @@ def launch_refarch_env(region=None,
   if byo_bastion in 'yes' and bastion_sg in '/dev/null':
     bastion_sg = click.prompt('Specify the the Bastion Security group(example: sg-4afdd24)')
 
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription is None:
+    rhsm_subscription = click.prompt('Specify whether or not the hosts shall carry an Red Hat Subscription')
+
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription not in 'yes':
+    rhsm_subscription = 'no'
+
   # If the user already provided values, don't bother asking again
-  if deployment_type in ['openshift-enterprise'] and rhsm_user is None:
+  if deployment_type in ['openshift-enterprise'] and rhsm_user is None and rhsm_subscription in 'yes':
     rhsm_user = click.prompt("RHSM username?")
-  if deployment_type in ['openshift-enterprise'] and rhsm_password is None:
+  if deployment_type in ['openshift-enterprise'] and rhsm_password is None and rhsm_subscription in 'yes':
     rhsm_password = click.prompt("RHSM password?", hide_input=True)
-  if deployment_type in ['openshift-enterprise'] and rhsm_pool is None:
+  if deployment_type in ['openshift-enterprise'] and rhsm_pool is None and rhsm_subscription in 'yes':
     rhsm_pool = click.prompt("RHSM Pool ID or Subscription Name?")
+
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription not in 'yes' and repo_mirror_url is None:
+    repo_mirror_url = click.prompt('Specify repository mirror base URL (http(s)://<gqdn>:<port>/)')
 
   # Calculate various DNS values
   wildcard_zone="%s.%s" % (app_dns_prefix, public_hosted_zone)
@@ -220,6 +235,9 @@ def launch_refarch_env(region=None,
   click.echo('\tpublic_hosted_zone: %s' % public_hosted_zone)
   click.echo('\tapp_dns_prefix: %s' % app_dns_prefix)
   click.echo('\tapps_dns: %s' % wildcard_zone)
+  click.echo('\trepo_mirror_url: %s' % repo_mirror_url)
+  click.echo('\tregistry_mirror_url: %s' % registry_mirror_url)
+  click.echo('\trhsm_subscription: %s' % rhsm_subscription)
   click.echo('\trhsm_user: %s' % rhsm_user)
   click.echo('\trhsm_password: *******')
   click.echo('\trhsm_pool: %s' % rhsm_pool)
@@ -281,6 +299,9 @@ def launch_refarch_env(region=None,
     console_port=%s \
     deployment_type=%s \
     openshift_sdn=%s \
+    repo_mirror_url=%s \
+    registry_mirror_url=%s \
+    rhsm_subscription=%s \
     rhsm_user=%s \
     rhsm_password=%s \
     rhsm_pool="%s" \
@@ -316,6 +337,9 @@ def launch_refarch_env(region=None,
                     console_port,
                     deployment_type,
                     openshift_sdn,
+                    repo_mirror_url,
+                    registry_mirror_url,
+                    rhsm_subscription,
                     rhsm_user,
                     rhsm_password,
                     rhsm_pool,

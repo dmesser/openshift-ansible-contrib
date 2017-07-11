@@ -31,4 +31,17 @@
         replace: 'enabled=0'
       when: client.stat.exists
 
-  when: ansible_distribution == "RedHat"
+  when: ansible_distribution == "RedHat" and rhsm_subscription|bool
+
+- block:
+    - name: add repos from deployment host
+      yum_repository:
+        name: "{{ item }}"
+        description: "{{ item }}"
+        baseurl: "{{ repo_mirror_url }}/{{ item }}"
+        enabled: yes
+        gpgcheck: no
+        state: present
+      with_items: "{{ gluster_repos }}"
+
+  when: ansible_distribution == "RedHat" and not rhsm_subscription|bool
