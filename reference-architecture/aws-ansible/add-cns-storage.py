@@ -45,6 +45,9 @@ import sys
 @click.option('--public-hosted-zone', help='hosted zone for accessing the environment')
 
 ### Subscription and Software options
+@click.option('--repo-mirror-url', help='Repository Mirror URL in case the host does not have a Red Hat Subscription')
+@click.option('--registry-mirror-url', help='Registry Mirror URL in case the host does not have access to the Red Hat Registry')
+@click.option('--rhsm-subscription', help='True or False whether host should have a Red Hat Subscription', show_default=True, default='yes')
 @click.option('--rhsm-user', help='Red Hat Subscription Management User')
 @click.option('--rhsm-password', help='Red Hat Subscription Management Password',
                 hide_input=True,)
@@ -72,6 +75,9 @@ def launch_refarch_env(region=None,
                     public_hosted_zone=None,
                     deployment_type=None,
                     console_port=443,
+                    repo_mirror_url=None,
+                    registry_mirror_url=None,
+                    rhsm_subscription=None,
                     rhsm_user=None,
                     rhsm_password=None,
                     rhsm_pool=None,
@@ -105,11 +111,15 @@ def launch_refarch_env(region=None,
     keypair = click.prompt('A SSH keypair must be specified or created')
 
   # If the user already provided values, don't bother asking again
-  if deployment_type in ['openshift-enterprise'] and rhsm_user is None:
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription not in 'yes' and repo_mirror_url is None:
+    repo_mirror_url = click.prompt('Specify repository mirror base URL (http(s)://<fqdn>:<port>/)')
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription not in 'yes' and registry_mirror_url is None:
+    registry_mirror_url = click.prompt('Specify registry mirror FQDN (<fqdn>:<port>)')
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription in 'yes' and rhsm_user is None:
     rhsm_user = click.prompt("RHSM username?")
-  if deployment_type in ['openshift-enterprise'] and rhsm_password is None:
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription in 'yes' and rhsm_password is None:
     rhsm_password = click.prompt("RHSM password?", hide_input=True)
-  if deployment_type in ['openshift-enterprise'] and rhsm_pool is None:
+  if deployment_type in ['openshift-enterprise'] and rhsm_subscription in 'yes' and rhsm_pool is None:
     rhsm_pool = click.prompt("RHSM Pool ID or Subscription Name for OpenShift?")
 
   # Prompt for vars if they are not defined
@@ -165,6 +175,9 @@ def launch_refarch_env(region=None,
       click.echo('\tdeployment_type: %s' % deployment_type)
       click.echo('\tpublic_hosted_zone: %s' % public_hosted_zone)
       click.echo('\tconsole port: %s' % console_port)
+      click.echo('\trepo_mirror_url: %s' % repo_mirror_url)
+      click.echo('\tregistry_mirror_url: %s' % registry_mirror_url)
+      click.echo('\trhsm_subscription: %s' % rhsm_subscription)
       click.echo('\trhsm_user: %s' % rhsm_user)
       click.echo('\trhsm_password: *******')
       click.echo('\trhsm_pool: %s' % rhsm_pool)
@@ -191,6 +204,9 @@ def launch_refarch_env(region=None,
       click.echo('\tdeployment_type: %s' % deployment_type)
       click.echo('\tpublic_hosted_zone: %s' % public_hosted_zone)
       click.echo('\tconsole port: %s' % console_port)
+      click.echo('\trepo_mirror_url: %s' % repo_mirror_url)
+      click.echo('\tregistry_mirror_url: %s' % registry_mirror_url)
+      click.echo('\trhsm_subscription: %s' % rhsm_subscription)
       click.echo('\trhsm_user: %s' % rhsm_user)
       click.echo('\trhsm_password: *******')
       click.echo('\trhsm_pool: %s' % rhsm_pool)
@@ -231,6 +247,9 @@ def launch_refarch_env(region=None,
     	public_hosted_zone=%s \
         deployment_type=%s \
         console_port=%s \
+        repo_mirror_url=%s \
+        registry_mirror_url=%s \
+        rhsm_subscription=%s \
         rhsm_user=%s \
         rhsm_password=%s \
         rhsm_pool="%s" \
@@ -251,6 +270,9 @@ def launch_refarch_env(region=None,
                     	public_hosted_zone,
                     	deployment_type,
                         console_port,
+                        repo_mirror_url,
+                        registry_mirror_url,
+                        rhsm_subscription,
                     	rhsm_user,
                     	rhsm_password,
                     	rhsm_pool,
@@ -277,6 +299,9 @@ def launch_refarch_env(region=None,
     	  public_hosted_zone=%s \
     	  deployment_type=%s \
           console_port=%s \
+          repo_mirror_url=%s \
+          registry_mirror_url=%s \
+          rhsm_subscription=%s \
     	  rhsm_user=%s \
     	  rhsm_password=%s \
     	  rhsm_pool="%s" \
@@ -302,6 +327,9 @@ def launch_refarch_env(region=None,
                     	public_hosted_zone,
                     	deployment_type,
                         console_port,
+                        repo_mirror_url,
+                        registry_mirror_url,
+                        rhsm_subscription,
                     	rhsm_user,
                     	rhsm_password,
                     	rhsm_pool,
