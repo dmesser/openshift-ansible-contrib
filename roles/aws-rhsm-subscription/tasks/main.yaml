@@ -52,4 +52,4 @@
       command: subscription-manager subscribe --pool {{ openshift_pool_id.stdout_lines[0] }}
       when: rhsm_pool is defined and rhsm_pool and openshift_pool_id.stdout != ''
 
-  when: ansible_distribution == "RedHat"
+  when: ansible_distribution == "RedHat" and rhsm_subscription|bool

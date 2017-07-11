@@ -66,4 +66,4 @@
 
       when: rhsm_pool is defined and rhsm_pool and subscription_attached.stdout == ""
 
-  when: ansible_distribution == "RedHat"
+  when: ansible_distribution == "RedHat" and rhsm_subscription|bool
