@@ -59,3 +59,5 @@
     openshift_hosted_metrics_storage_kind: dynamic
     openshift_metrics_hawkular_hostname: "hawkular-metrics.apps.{{ public_hosted_zone }}"
     openshift_hosted_metrics_storage_volume_size: 20Gi
+    openshift_docker_additional_registries: "{{ registry_mirror_url | default(None)  }}"
+    openshift_docker_insecure_registries: "{{ registry_mirror_url | default(None) }} "
