@@ -1,12 +1,6 @@
 ---
+
 - block:
-    - name: disable unneeded repos
-      command: subscription-manager repos --disable='*'
-
-    - name: ensure proper repos are assigned
-      command: subscription-manager repos --enable={{ item }}
-      with_items: "{{ openshift_required_repos }}"
-
     - name: check to see if rhui exists
       stat:
         path: /etc/yum.repos.d/redhat-rhui.repo
@@ -30,6 +24,16 @@
         regexp: 'enabled=1'
         replace: 'enabled=0'
       when: client.stat.exists
+      
+  when: ansible_distribution == "RedHat"
+
+- block:
+    - name: disable unneeded repos
+      command: subscription-manager repos --disable='*'
+
+    - name: ensure proper repos are assigned
+      command: subscription-manager repos --enable={{ item }}
+      with_items: "{{ openshift_required_repos }}"
 
   when: ansible_distribution == "RedHat" and rhsm_subscription|bool
 
