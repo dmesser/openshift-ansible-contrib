@@ -1260,6 +1260,14 @@
               "VolumeSize": {"Ref": "NodeEmptyVolSize"},
               "VolumeType": {"Ref": "NodeEmptyVolType"}
             }
+          },
+          {
+            "DeviceName": "/dev/xvdd",
+            "Ebs": {
+              "DeleteOnTermination": "true",
+              "VolumeSize": "100",
+              "VolumeType": "gp2"
+            }
           }
          ]
      }
@@ -1307,6 +1315,14 @@
               "VolumeSize": {"Ref": "NodeEmptyVolSize"},
               "VolumeType": {"Ref": "NodeEmptyVolType"}
             }
+          },
+          {
+            "DeviceName": "/dev/xvdd",
+            "Ebs": {
+              "DeleteOnTermination": "true",
+              "VolumeSize": "100",
+              "VolumeType": "gp2"
+            }
           }
          ]
      }
@@ -1353,6 +1369,14 @@
               "DeleteOnTermination": "true",
               "VolumeSize": {"Ref": "NodeEmptyVolSize"},
               "VolumeType": {"Ref": "NodeEmptyVolType"}
+            }
+          },
+          {
+            "DeviceName": "/dev/xvdd",
+            "Ebs": {
+              "DeleteOnTermination": "true",
+              "VolumeSize": "100",
+              "VolumeType": "gp2"
             }
           }
          ]
