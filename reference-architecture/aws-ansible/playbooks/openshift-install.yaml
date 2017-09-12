@@ -21,4 +21,4 @@
 
 - include: ../../../playbooks/aws-prerequisite.yaml
 
-- include: openshift-setup.yaml
+#- include: openshift-setup.yaml
