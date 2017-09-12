@@ -1,14 +1,24 @@
 ---
-openshift_deployment_type: openshift-enterprise
-openshift_release: v3.5
+openshift_deployment_type: origin
+#openshift_deployment_type: openshift-enterprise
+#openshift_release: v3.5
 openshift_master_default_subdomain: "apps.{{ env_id }}.{{ public_dns_domain }}"
 
-# NOTE(shadower): do not remove this line, otherwise the default node labels
-# won't be set up.
-openshift_node_labels: "{{ openstack.metadata.node_labels }}"
+openshift_master_cluster_method: native
+openshift_master_cluster_hostname: "{{ groups.lb.0|default(groups.masters.0) }}"
+openshift_master_cluster_public_hostname: "{{ groups.lb.0|default(groups.masters.0) }}"
 
 osm_default_node_selector: 'region=primary'
+
+# NOTE(shadower): the hostname check seems to always fail because the
+# host's floating IP address doesn't match the address received from
+# inside the host.
+openshift_override_hostname_check: true
 
 # For POCs or demo environments that are using smaller instances than
 # the official recommended values for RAM and DISK, uncomment the line below.
 #openshift_disable_check: disk_availability,memory_availability
+
+# NOTE(shadower): Always switch to root on the OSEv3 nodes.
+# openshift-ansible requires an explicit `become`.
+ansible_become: true
