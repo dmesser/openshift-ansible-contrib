@@ -23,9 +23,8 @@
   gather_facts: no
   become: yes
   roles:
-    - rhsm-repos
-    - prerequisites
-    - { role: docker-storage-setup, docker_dev: "/dev/xvdb", docker_vg: "docker_vg", docker_data_size: "95%VG", docker_dm_basesize: "3G" }
-    - { role: docker, default_docker_storage_block_device: "/dev/xvdb", default_docker_storage_volume_group: "docker_vg" }
-  when: deployment_type in ["enterprise", "atomic-enterprise", "openshift-enterprise"] and
-        ansible_distribution == "RedHat" and (rhsm_user is defined or repo_mirror_url is defined)
+  - role: rhsm-repos
+    when: deployment_type in ["enterprise", "atomic-enterprise", "openshift-enterprise"] and ansible_distribution == "RedHat"
+  - role: prerequisites
+  - { role: docker-storage-setup, docker_dev: "/dev/xvdb", docker_vg: "docker_vg", docker_data_size: "95%VG", docker_dm_basesize: "3G" }
+  - { role: docker, default_docker_storage_block_device: "/dev/xvdb", default_docker_storage_volume_group: "docker_vg" }
