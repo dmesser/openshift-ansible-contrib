@@ -26,7 +26,7 @@ write_files:
     DEVS='/dev/xvdb'
     VG=docker_vol
     DATA_SIZE=95%VG
-    STORAGE_DRIVER=device-mapper
+    STORAGE_DRIVER=overlay2
     ROOT_SIZE=45G
     GROWPART=true
   path: /etc/sysconfig/docker-storage-setup
